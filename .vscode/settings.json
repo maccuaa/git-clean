@@ -1,0 +1,35 @@
+{
+  //
+  // Eslint Settings
+  //
+  "eslint.autoFixOnSave": true,
+  "eslint.run": "onSave",
+  "eslint.enable": true,
+  "eslint.validate": [{ "language": "javascript", "autoFix": true }, { "language": "json", "autoFix": true }],
+  "eslint.workingDirectories": [{ "directory": "./", "changeProcessCWD": true }],
+  //
+  // Whitespace
+  //
+  "files.trimTrailingWhitespace": true,
+  //
+  // Editor Settings
+  //
+  "editor.formatOnSave": true,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.renderIndentGuides": true,
+  "editor.tabSize": 2,
+  "editor.minimap.enabled": false,
+  "editor.minimap.renderCharacters": false,
+  "editor.wordBasedSuggestions": false,
+  "editor.fontLigatures": true,
+  "editor.rulers": [120],
+  //
+  // NPM Intellisense
+  //
+  "npm-intellisense.importES6": true,
+  "npm-intellisense.scanDevDependencies": true,
+  "npm-intellisense.showBuildInLibs": true,
+  "npm-intellisense.packageSubfoldersIntellisense": true,
+
+  "javascript.updateImportsOnFileMove.enabled": "always"
+}
