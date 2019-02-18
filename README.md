@@ -43,10 +43,14 @@ PROTECTED_BRANCHES = HEAD, origin/master
 
 #### Options
 
-- **REMOTE_URL** is the URL to the remote Git server.
-- **JIRA_PROJECTS** comma separated list of Jira project codes that you want to display links for.
-- **MAIN_BRANCH** is the name of your main branch. Generally this is the _master_ branch.
-- **PROTECTED_BRANCHES** comma separated list of branches that are protected and should not be deleted. Branches matching any of these values will not be displayed by git-clean.
+| Option             | Description                                                                    |
+| ------------------ | ------------------------------------------------------------------------------ |
+| REMOTE_URL         | the URL to the remote Git server                                               |
+| JIRA_PROJECTS      | comma separated list of Jira project codes that you want to display links for  |
+| MAIN_BRANCH        | the name of your main branch. Generally this is the _master_ branch            |
+| PROTECTED_BRANCHES | comma separated list of branches that are protected and should not be deleted. |
+
+Branches matching any of PROTECTED_BRANCHES values these values will not be displayed by git-clean.
 
 ### Recommended Setup for large projects
 
