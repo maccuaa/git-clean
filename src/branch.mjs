@@ -3,8 +3,8 @@ import chalk from "chalk";
 import shell from "shelljs";
 import inquirer from "inquirer";
 import urlJoin from "url-join";
-import execAsync from "./execAsync";
-import { LOCAL } from "./index";
+import execAsync, { exec } from "./execAsync";
+import { LOCAL, REMOTE } from "./index";
 
 export default class Helper {
   conf = null;
@@ -16,7 +16,7 @@ export default class Helper {
     this.jiraProjects = this.getJiraProjects(conf);
   }
 
-  getBranches = async type => {
+  getBranches = async (type, mergeState) => {
     let branches = [];
 
     const spinner = ora("Finding branches...").start();
@@ -24,15 +24,15 @@ export default class Helper {
     try {
       switch (type) {
         case "local":
-          branches = await this.fetchLocalBranches();
+          branches = await this.fetchLocalBranches(mergeState);
           break;
         case "remote":
-          branches = await this.fetchRemoteBranches();
+          branches = await this.fetchRemoteBranches(mergeState);
           break;
       }
     } catch (e) {
-      console.error(e);
       spinner.fail().stop();
+      console.error(e);
       shell.exit(1);
     }
 
@@ -41,6 +41,10 @@ export default class Helper {
     spinner.succeed().stop();
 
     console.log("Found", chalk.magenta(total), "branches...");
+
+    if (total === 0) {
+      shell.exit(0);
+    }
 
     spinner.start("Getting branch information...");
 
@@ -104,7 +108,7 @@ export default class Helper {
     const answers = await inquirer.prompt([
       {
         type: "checkbox",
-        message: "Select branches to delete",
+        message: "Select branches to delete (use the Spacebar to select branches and Enter to confirm)",
         name: "branches",
         pageSize: 30,
         choices: authors.reduce((choices, author) => {
@@ -127,13 +131,21 @@ export default class Helper {
     if (answers.confirmDelete) {
       console.log(chalk.red("Deleting", answers.branches.length, "branches..."));
 
+      // Start by pruning branches
+      this.prune();
+
       if (answers.branches.length > 0) {
         const branchStr = answers.branches.map(branch => branch.prettyName).join(" ");
 
-        if (type === LOCAL) {
-          shell.exec(`git branch -d ${branchStr}`);
-        } else {
-          shell.exec(`git push origin --delete ${branchStr}`);
+        try {
+          if (type === LOCAL) {
+            exec(`git branch -D ${branchStr}`);
+          } else {
+            exec(`git push origin --delete ${branchStr}`);
+          }
+        } catch (e) {
+          console.error(e);
+          shell.exit(1);
         }
       }
       console.log(chalk.green("done."));
@@ -145,14 +157,14 @@ export default class Helper {
   // ============================================================================================
   // PRIVATE FUNCTIONS
   // ============================================================================================
-  fetchLocalBranches = async () => {
-    const command = `git branch --merged ${this.conf.MAIN_BRANCH}`;
+  fetchLocalBranches = async mergeState => {
+    const command = `git branch --${mergeState} ${this.conf.MAIN_BRANCH}`;
 
     return this.execFetchBranches(command);
   };
 
-  fetchRemoteBranches = async () => {
-    let command = `git branch -r --merged ${this.conf.MAIN_BRANCH} | grep -v `;
+  fetchRemoteBranches = mergeState => {
+    let command = `git branch -r --${mergeState} ${this.conf.MAIN_BRANCH} | grep -v `;
 
     const protectedBranches = this.conf.PROTECTED_BRANCHES.split(",").map(b => b.trim());
 
@@ -170,10 +182,21 @@ export default class Helper {
   };
 
   sanitizeBranchOutput = input => {
-    return input
-      .split("\n")
-      .map(branch => branch.trim())
-      .filter(branch => !branch.includes("develop"));
+    return (
+      input
+        .split("\n")
+        // Remove the asterisk from the git branch output
+        .map(branch => branch.replace(/^\*/, ""))
+
+        // Remove all whitespace
+        .map(branch => branch.trim())
+
+        // Remove any empty lines
+        .filter(branch => branch !== "")
+
+        // Filter out the main branch
+        .filter(branch => !branch.includes(this.conf.MAIN_BRANCH))
+    );
   };
 
   getJiraUrl = branch => {
@@ -187,7 +210,7 @@ export default class Helper {
       return "";
     }
 
-    return urlJoin(this.conf.BITBUCKET_URL, "browse", result[0]);
+    return urlJoin(this.conf.REMOTE_URL, "browse", result[0]);
   };
 
   /**
@@ -229,5 +252,9 @@ export default class Helper {
     if (!confStr) return;
 
     return conf.JIRA_PROJECTS.split(",").map(b => b.trim());
+  };
+
+  prune = () => {
+    exec("git remote prune origin");
   };
 }

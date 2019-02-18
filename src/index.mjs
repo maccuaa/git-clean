@@ -2,13 +2,15 @@ import inquirer from "inquirer";
 import shell from "shelljs";
 import rc from "rc";
 import chalk from "chalk";
-import Helper from "./branch";
+import Branch from "./branch";
 
 /* ============================================================================================
  * Constants
  * ============================================================================================ */
-const LOCAL = "local";
-const REMOTE = "remote";
+export const LOCAL = "local";
+export const REMOTE = "remote";
+const MERGED = "merged";
+const UNMERGED = "no-merged";
 const LIST_ALL = "list_all";
 const LIST_BY_AUTHOR = "list_by_author";
 const FIND_BY_AUTHOR = "find_by_author";
@@ -20,14 +22,14 @@ const VIEW_AND_DELETE = "view_and_delete";
  * ============================================================================================ */
 
 const main = async () => {
-  // Load Application Configuration
+  // Load Application Configuration - These are the defaults values.
   const conf = rc("gitclean", {
     MAIN_BRANCH: "master",
     PROTECTED_BRANCHES: "HEAD, origin/master"
   });
 
-  if (!conf.BITBUCKET_URL) {
-    console.log(chalk.red("BITBUCKET_URL not set. Please see the README for instructions."));
+  if (!conf.REMOTE_URL) {
+    console.log(chalk.red("REMOTE_URL not set. Please see the README for instructions."));
     shell.exit(1);
   }
 
@@ -37,10 +39,7 @@ const main = async () => {
     shell.exit(1);
   }
 
-  const h = new Helper(conf);
-
-  // TODO: Add option to list all unmerged branches.
-  // Git Command: git log -n 1 --pretty=format:"%cn | %cr | %cI" --abbrev-commit ${this.conf.MAIN_BRANCH}...${branch}
+  const b = new Branch(conf);
 
   let answer = await inquirer.prompt([
     {
@@ -49,6 +48,13 @@ const main = async () => {
       message: "Do you want to view local or remote branches?",
       default: LOCAL,
       choices: [LOCAL, REMOTE]
+    },
+    {
+      type: "list",
+      name: "mergeState",
+      message: "Do you want to view merged or unmerged branches?",
+      default: MERGED,
+      choices: [MERGED, UNMERGED]
     },
     {
       when: answers => answers.type === REMOTE,
@@ -96,29 +102,29 @@ const main = async () => {
     }
   ]);
 
-  let branches = await h.getBranches(answer.type);
+  let branches = await b.getBranches(answer.type, answer.mergeState);
 
-  if (answer.type === LOCAL) {
-    branches.forEach(h.prettyPrint);
-    shell.exit(0);
-  } else {
+  if (answer.type === REMOTE) {
     switch (answer.action) {
       case LIST_ALL:
-        branches.forEach(h.prettyPrint);
+        branches.forEach(b.prettyPrint);
         break;
       case LIST_BY_AUTHOR:
-        branches = h.groupByAuthor(branches);
-        h.prettyPrintByAuthor(branches);
+        branches = b.groupByAuthor(branches);
+        b.prettyPrintByAuthor(branches);
         break;
       case FIND_BY_AUTHOR:
-        branches = h.branchesByAuthor(branches, answer.author);
-        h.prettyPrintByAuthor(branches);
+        branches = b.branchesByAuthor(branches, answer.author);
+        b.prettyPrintByAuthor(branches);
         break;
     }
+  } else {
+    branches = b.groupByAuthor(branches);
+    b.prettyPrintByAuthor(branches);
   }
 
   if (answer.outcome === VIEW_AND_DELETE) {
-    await h.deleteBranches(branches, answer.type);
+    await b.deleteBranches(branches, answer.type);
   }
 
   shell.exit(0);

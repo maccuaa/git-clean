@@ -10,4 +10,8 @@ const execAsync = (cmd, opts = {}) => {
   });
 };
 
+export const exec = (cmd, opts = {}) => {
+  return shell.exec(cmd, opts);
+};
+
 export default execAsync;
