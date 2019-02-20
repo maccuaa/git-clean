@@ -1,6 +1,6 @@
 {
   "name": "@maccuaa/git-clean",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI tool for finding stale Git branches",
   "main": "bin/git-clean",
   "preferGlobal": true,
@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "rimraf dist && babel src --out-dir dist",
+    "prepublish": "npm run build",
     "start": "babel-node src/index.mjs"
   },
   "repository": {
