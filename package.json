@@ -1,6 +1,6 @@
 {
   "name": "@maccuaa/git-clean",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CLI tool for finding stale Git branches",
   "main": "bin/git-clean",
   "preferGlobal": true,
