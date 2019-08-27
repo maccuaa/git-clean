@@ -8,8 +8,9 @@
     "git-clean": "bin/git-clean.js"
   },
   "scripts": {
-    "build": "rimraf dist && babel src --out-dir dist",
-    "prepublish": "npm run build",
+    "lint": "eslint --ext mjs ./src",
+    "build": "rimraf dist && npm run lint && babel src --out-dir dist",
+    "prepublish": "npm run lint && npm run build",
     "start": "babel-node src/index.mjs"
   },
   "repository": {
@@ -22,24 +23,24 @@
   "author": "Andrew MacCuaig <andrewmaccuaig@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "7.2.3",
-    "@babel/core": "7.2.2",
-    "@babel/node": "7.2.2",
-    "@babel/plugin-proposal-class-properties": "7.3.0",
-    "@babel/preset-env": "7.3.1",
-    "babel-eslint": "10.0.1",
-    "eslint": "5.12.1",
-    "eslint-config-prettier": "3.6.0",
-    "eslint-plugin-prettier": "3.0.1",
-    "prettier": "1.16.1",
-    "rimraf": "2.6.3"
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.2.2",
+    "eslint-config-prettier": "^6.1.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.18.2",
+    "rimraf": "^3.0.0"
   },
   "dependencies": {
     "chalk": "2.4.2",
-    "inquirer": "6.2.1",
-    "ora": "3.0.0",
+    "inquirer": "^7.0.0",
+    "ora": "^3.4.0",
     "rc": "1.2.8",
     "shelljs": "0.8.3",
-    "url-join": "4.0.0"
+    "url-join": "^4.0.1"
   }
 }

@@ -4,7 +4,7 @@ import shell from "shelljs";
 import inquirer from "inquirer";
 import urlJoin from "url-join";
 import execAsync, { exec } from "./execAsync";
-import { LOCAL, REMOTE } from "./index";
+import { LOCAL } from "./index";
 
 export default class Helper {
   conf = null;
