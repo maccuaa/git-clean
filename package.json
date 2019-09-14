@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint --ext mjs ./src",
     "build": "rimraf dist && npm run lint && babel src --out-dir dist",
-    "prepublish": "npm run lint && npm run build",
+    "prepublishOnly": "npm run lint && npm run build",
     "start": "babel-node src/index.mjs"
   },
   "repository": {
