@@ -2,12 +2,12 @@
 
 Keeping the number of branches in your git repository sane.
 
-### Find Stale Git Branches
+### About
 
 Use this scipt to identify stale git branches that should be deleted. It does this by iterating over every branch
 in the repository and getting the last commit author, and the date of the last commit.
 
-### Install
+# Install
 
 1. Install git-clean from NPM.
 
@@ -19,7 +19,7 @@ npm i -g @maccuaa/git-clean
 npm i -D @maccuaa/git-clean
 ```
 
-### Configure
+# Configure
 
 Once installed, you must configure some parameters for git-clean.
 
@@ -52,8 +52,10 @@ PROTECTED_BRANCHES = HEAD, origin/master
 
 Branches matching any of PROTECTED_BRANCHES values these values will not be displayed by git-clean.
 
-### Recommended Setup for large projects
+# Recommended Setup for large projects
 
 For large projects with multiple developers and a large number of branches it is recommended to commit a `.gitcleanrc` file in the root of your project.
 
 install **git-clean** as a devDependency
+
+# Contribute
