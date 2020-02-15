@@ -1,5 +1,7 @@
 # @maccuaa/git-clean
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/maccuaa/git-clean.svg)](https://greenkeeper.io/)
+
 Keeping the number of branches in your git repository sane.
 
 ### About
