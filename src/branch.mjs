@@ -63,9 +63,9 @@ export default class Helper {
     return branches;
   };
 
-  groupByAuthor = branches => {
+  groupByAuthor = (branches) => {
     const groups = {};
-    branches.forEach(branch => {
+    branches.forEach((branch) => {
       if (!(branch.author in groups)) {
         groups[branch.author] = [];
       }
@@ -76,7 +76,7 @@ export default class Helper {
 
   branchesByAuthor = (branches, author) => {
     const group = {};
-    branches.forEach(branch => {
+    branches.forEach((branch) => {
       if (branch.author.toLowerCase().includes(author.toLowerCase())) {
         if (!(branch.author in group)) {
           group[branch.author] = [];
@@ -87,15 +87,15 @@ export default class Helper {
     return group;
   };
 
-  prettyPrintByAuthor = branchesByAuthor => {
+  prettyPrintByAuthor = (branchesByAuthor) => {
     // Sort by author first
     const authors = Object.keys(branchesByAuthor).sort();
 
-    authors.forEach(author => {
+    authors.forEach((author) => {
       const branches = branchesByAuthor[author];
       console.log(chalk.underline.green(author), "-", chalk.bold.red(branches.length));
       console.log();
-      branches.forEach(branch =>
+      branches.forEach((branch) =>
         console.log(chalk.blue(branch.prettyDate.padEnd(25)), branch.prettyName.padEnd(75), chalk.cyan(branch.url))
       );
       console.log();
@@ -114,18 +114,18 @@ export default class Helper {
         choices: authors.reduce((choices, author) => {
           return choices.concat(
             new inquirer.Separator(author),
-            branches[author].map(branch => {
+            branches[author].map((branch) => {
               return { name: branch.prettyName, value: branch, checked: false };
             })
           );
-        }, [])
+        }, []),
       },
       {
         type: "confirm",
         name: "confirmDelete",
         message: "Are you sure you want to delete these branches?",
-        default: false
-      }
+        default: false,
+      },
     ]);
 
     if (answers.confirmDelete) {
@@ -135,7 +135,7 @@ export default class Helper {
       this.prune();
 
       if (answers.branches.length > 0) {
-        const branchStr = answers.branches.map(branch => branch.prettyName).join(" ");
+        const branchStr = answers.branches.map((branch) => branch.prettyName).join(" ");
 
         try {
           if (type === LOCAL) {
@@ -157,23 +157,23 @@ export default class Helper {
   // ============================================================================================
   // PRIVATE FUNCTIONS
   // ============================================================================================
-  fetchLocalBranches = async mergeState => {
+  fetchLocalBranches = async (mergeState) => {
     const command = `git branch --${mergeState} ${this.conf.MAIN_BRANCH}`;
 
     return this.execFetchBranches(command);
   };
 
-  fetchRemoteBranches = mergeState => {
+  fetchRemoteBranches = (mergeState) => {
     let command = `git branch -r --${mergeState} ${this.conf.MAIN_BRANCH} | grep -v `;
 
-    const protectedBranches = this.conf.PROTECTED_BRANCHES.split(",").map(b => b.trim());
+    const protectedBranches = this.conf.PROTECTED_BRANCHES.split(",").map((b) => b.trim());
 
-    command = command.concat(protectedBranches.map(b => `-e ${b}`).join(" "));
+    command = command.concat(protectedBranches.map((b) => `-e ${b}`).join(" "));
 
     return this.execFetchBranches(command);
   };
 
-  execFetchBranches = async command => {
+  execFetchBranches = async (command) => {
     const output = await execAsync(command, { silent: true });
 
     const branches = this.sanitizeBranchOutput(output);
@@ -181,25 +181,25 @@ export default class Helper {
     return branches;
   };
 
-  sanitizeBranchOutput = input => {
+  sanitizeBranchOutput = (input) => {
     return (
       input
         .split("\n")
         // Remove the asterisk from the git branch output
-        .map(branch => branch.replace(/^\*/, ""))
+        .map((branch) => branch.replace(/^\*/, ""))
 
         // Remove all whitespace
-        .map(branch => branch.trim())
+        .map((branch) => branch.trim())
 
         // Remove any empty lines
-        .filter(branch => branch !== "")
+        .filter((branch) => branch !== "")
 
         // Filter out the main branch
-        .filter(branch => !branch.includes(this.conf.MAIN_BRANCH))
+        .filter((branch) => !branch.includes(this.conf.MAIN_BRANCH))
     );
   };
 
-  getJiraUrl = branch => {
+  getJiraUrl = (branch) => {
     if (!this.jiraProjects) return "";
 
     const regex = new RegExp(`(${this.jiraProjects.join("|")})-[\\d]+`, "i");
@@ -220,12 +220,12 @@ export default class Helper {
    *    %cr: committer date, relative
    *    %cI: committer date (ISO 8601)
    */
-  getBranchInfo = async branch => {
+  getBranchInfo = async (branch) => {
     let info = await execAsync(`git log -n 1 --pretty=format:"%cn | %cr | %cI" ${branch}`, {
-      silent: true
+      silent: true,
     });
 
-    info = info.split("|").map(info => info.trim());
+    info = info.split("|").map((info) => info.trim());
 
     return {
       author: info[0],
@@ -233,11 +233,11 @@ export default class Helper {
       date: new Date(info[2]),
       name: branch,
       prettyName: branch.replace("origin/", ""),
-      url: this.getJiraUrl(branch)
+      url: this.getJiraUrl(branch),
     };
   };
 
-  prettyPrint = branch => {
+  prettyPrint = (branch) => {
     console.log(
       chalk.blue(branch.prettyDate.padEnd(25)),
       chalk.green(branch.author.padEnd(25)),
@@ -246,12 +246,12 @@ export default class Helper {
     );
   };
 
-  getJiraProjects = conf => {
+  getJiraProjects = (conf) => {
     const confStr = conf.JIRA_PROJECTS;
 
     if (!confStr) return;
 
-    return conf.JIRA_PROJECTS.split(",").map(b => b.trim());
+    return conf.JIRA_PROJECTS.split(",").map((b) => b.trim());
   };
 
   prune = () => {

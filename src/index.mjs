@@ -25,7 +25,7 @@ const main = async () => {
   // Load Application Configuration - These are the defaults values.
   const conf = rc("gitclean", {
     MAIN_BRANCH: "master",
-    PROTECTED_BRANCHES: "HEAD, origin/master"
+    PROTECTED_BRANCHES: "HEAD, origin/master",
   });
 
   if (!conf.REMOTE_URL) {
@@ -47,17 +47,17 @@ const main = async () => {
       name: "type",
       message: "Do you want to view local or remote branches?",
       default: LOCAL,
-      choices: [LOCAL, REMOTE]
+      choices: [LOCAL, REMOTE],
     },
     {
       type: "list",
       name: "mergeState",
       message: "Do you want to view merged or unmerged branches?",
       default: MERGED,
-      choices: [MERGED, UNMERGED]
+      choices: [MERGED, UNMERGED],
     },
     {
-      when: answers => answers.type === REMOTE,
+      when: (answers) => answers.type === REMOTE,
       type: "list",
       name: "action",
       message: "What do you want to do?",
@@ -65,24 +65,24 @@ const main = async () => {
       choices: [
         {
           name: "List all (oldest to newest)",
-          value: LIST_ALL
+          value: LIST_ALL,
         },
         {
           name: "List all (grouped by author)",
-          value: LIST_BY_AUTHOR
+          value: LIST_BY_AUTHOR,
         },
         {
           name: "Find by author",
-          value: FIND_BY_AUTHOR
-        }
-      ]
+          value: FIND_BY_AUTHOR,
+        },
+      ],
     },
     {
-      when: answers => answers.action === FIND_BY_AUTHOR,
+      when: (answers) => answers.action === FIND_BY_AUTHOR,
       type: "input",
       name: "author",
       message: "Enter author name (case-insensitive)",
-      validate: value => !!value
+      validate: (value) => !!value,
     },
     {
       type: "list",
@@ -92,14 +92,14 @@ const main = async () => {
       choices: [
         {
           name: "View only",
-          value: VIEW_ONLY
+          value: VIEW_ONLY,
         },
         {
           name: "View and delete",
-          value: VIEW_AND_DELETE
-        }
-      ]
-    }
+          value: VIEW_AND_DELETE,
+        },
+      ],
+    },
   ]);
 
   let branches = await b.getBranches(answer.type, answer.mergeState);
