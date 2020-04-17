@@ -31,5 +31,8 @@
   "npm-intellisense.showBuildInLibs": true,
   "npm-intellisense.packageSubfoldersIntellisense": true,
 
-  "javascript.updateImportsOnFileMove.enabled": "always"
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }
