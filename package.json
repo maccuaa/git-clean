@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "chalk": "4.1.1",
-    "inquirer": "8.0.0",
+    "inquirer": "8.1.1",
     "ora": "5.4.0",
     "rc": "1.2.8",
     "shelljs": "0.8.4",
