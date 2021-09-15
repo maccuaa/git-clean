@@ -1,8 +1,8 @@
+import Branch from "./branch.mjs";
+import c from "ansi-colors";
 import inquirer from "inquirer";
-import shell from "shelljs";
 import rc from "rc";
-import chalk from "chalk";
-import Branch from "./branch";
+import shell from "shelljs";
 
 /* ============================================================================================
  * Constants
@@ -29,13 +29,13 @@ const main = async () => {
   });
 
   if (!conf.REMOTE_URL) {
-    console.log(chalk.red("REMOTE_URL not set. Please see the README for instructions."));
+    console.log(c.red("REMOTE_URL not set. Please see the README for instructions."));
     shell.exit(1);
   }
 
   // Make sure Git is installed
   if (!shell.which("git")) {
-    console.log(chalk.red("Sorry, this script requires git to be installed"));
+    console.log(c.red("Sorry, this script requires git to be installed"));
     shell.exit(1);
   }
 

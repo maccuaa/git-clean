@@ -2,43 +2,37 @@
   "name": "@maccuaa/git-clean",
   "version": "1.0.5",
   "description": "CLI tool for finding stale Git branches",
-  "main": "bin/git-clean",
+  "main": "src/index.mjs",
   "preferGlobal": true,
   "bin": {
-    "git-clean": "bin/git-clean.js"
+    "git-clean": "src/index.mjs"
   },
   "scripts": {
     "lint": "eslint --ext mjs ./src",
-    "build": "rimraf dist && npm run lint && babel src --out-dir dist",
-    "prepublishOnly": "npm run lint && npm run build",
-    "start": "babel-node src/index.mjs"
+    "build": "npm run lint",
+    "prepublishOnly": "npm run build",
+    "start": "node src/index.mjs"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/maccuaa/git-clean.git"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "author": "Andrew MacCuaig <andrewmaccuaig@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "7.13.16",
-    "@babel/core": "7.14.0",
-    "@babel/node": "7.13.13",
-    "@babel/plugin-proposal-class-properties": "7.13.0",
-    "@babel/preset-env": "7.14.1",
-    "babel-eslint": "10.1.0",
-    "eslint": "7.26.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
-    "eslint-plugin-prettier": "3.4.0",
-    "prettier": "2.3.0",
-    "rimraf": "3.0.2"
+    "eslint-plugin-prettier": "4.0.0",
+    "prettier": "2.4.0"
   },
   "dependencies": {
-    "chalk": "4.1.1",
-    "inquirer": "8.0.0",
-    "ora": "5.4.0",
+    "ansi-colors": "4.1.1",
+    "inquirer": "8.1.4",
+    "ora": "6.0.1",
     "rc": "1.2.8",
     "shelljs": "0.8.4",
     "url-join": "4.0.1"

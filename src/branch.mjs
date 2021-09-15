@@ -1,10 +1,11 @@
-import ora from "ora";
-import chalk from "chalk";
-import shell from "shelljs";
+import execAsync, { exec } from "./execAsync.mjs";
+
+import { LOCAL } from "./index.mjs";
+import c from "ansi-colors";
 import inquirer from "inquirer";
+import ora from "ora";
+import shell from "shelljs";
 import urlJoin from "url-join";
-import execAsync, { exec } from "./execAsync";
-import { LOCAL } from "./index";
 
 export default class Helper {
   conf = null;
@@ -40,7 +41,7 @@ export default class Helper {
 
     spinner.succeed().stop();
 
-    console.log("Found", chalk.magenta(total), "branches...");
+    console.log("Found", c.magenta(total), "branches...");
 
     if (total === 0) {
       shell.exit(0);
@@ -93,10 +94,10 @@ export default class Helper {
 
     authors.forEach((author) => {
       const branches = branchesByAuthor[author];
-      console.log(chalk.underline.green(author), "-", chalk.bold.red(branches.length));
+      console.log(c.underline.green(author), "-", c.bold.red(branches.length));
       console.log();
       branches.forEach((branch) =>
-        console.log(chalk.blue(branch.prettyDate.padEnd(25)), branch.prettyName.padEnd(75), chalk.cyan(branch.url))
+        console.log(c.blue(branch.prettyDate.padEnd(25)), branch.prettyName.padEnd(75), c.cyan(branch.url))
       );
       console.log();
     });
@@ -129,7 +130,7 @@ export default class Helper {
     ]);
 
     if (answers.confirmDelete) {
-      console.log(chalk.red("Deleting", answers.branches.length, "branches..."));
+      console.log(c.red("Deleting", answers.branches.length, "branches..."));
 
       // Start by pruning branches
       this.prune();
@@ -148,7 +149,7 @@ export default class Helper {
           shell.exit(1);
         }
       }
-      console.log(chalk.green("done."));
+      console.log(c.green("done."));
     } else {
       console.log("Exiting without deleting any branches.");
     }
@@ -239,10 +240,10 @@ export default class Helper {
 
   prettyPrint = (branch) => {
     console.log(
-      chalk.blue(branch.prettyDate.padEnd(25)),
-      chalk.green(branch.author.padEnd(25)),
+      c.blue(branch.prettyDate.padEnd(25)),
+      c.green(branch.author.padEnd(25)),
       branch.prettyName.padEnd(75),
-      chalk.cyan(branch.url)
+      c.cyan(branch.url)
     );
   };
 

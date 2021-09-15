@@ -1,2 +1,7 @@
-src/
+.eslintrc
+.gitcleanrc
+.github/dependabot.yml
+.github/workflows/build.yml
+.prettierrc.yaml
+.vscode/settings.json
 README.md

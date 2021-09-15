@@ -2,10 +2,7 @@
   //
   // Eslint Settings
   //
-  "eslint.autoFixOnSave": true,
   "eslint.run": "onSave",
-  "eslint.enable": true,
-  "eslint.validate": [{ "language": "javascript", "autoFix": true }, { "language": "json", "autoFix": true }],
   "eslint.workingDirectories": [{ "directory": "./", "changeProcessCWD": true }],
   //
   // Whitespace
