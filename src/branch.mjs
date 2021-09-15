@@ -222,7 +222,7 @@ export default class Helper {
    *    %cI: committer date (ISO 8601)
    */
   getBranchInfo = async (branch) => {
-    let info = await execAsync(`git log -n 1 --pretty=format:"%cn | %cr | %cI" ${branch}`, {
+    let info = await execAsync(`git log -n 1 --pretty=format:"%cn | %cr | %cI" "${branch}"`, {
       silent: true,
     });
 
