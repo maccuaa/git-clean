@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "ansi-colors": "4.1.1",
-    "inquirer": "8.1.4",
+    "inquirer": "8.1.5",
     "ora": "6.0.1",
     "rc": "1.2.8",
     "shelljs": "0.8.4",
