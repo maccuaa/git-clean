@@ -1,5 +1,5 @@
 import Branch from "./branch.mjs";
-import c from "yoctocolors";
+import * as c from "yoctocolors";
 import inquirer from "inquirer";
 import rc from "rc";
 import shell from "shelljs";

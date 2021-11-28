@@ -1,7 +1,7 @@
 import execAsync, { exec } from "./execAsync.mjs";
 
 import { LOCAL } from "./index.mjs";
-import c from "yoctocolors";
+import * as c from "yoctocolors";
 import inquirer from "inquirer";
 import ora from "ora";
 import shell from "shelljs";
