@@ -18,21 +18,21 @@
     "url": "https://github.com/maccuaa/git-clean.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "author": "Andrew MacCuaig <andrewmaccuaig@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^8.3.0",
+    "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.5.0"
+    "prettier": "^2.5.1"
   },
   "dependencies": {
     "inquirer": "8.2.0",
     "ora": "6.0.1",
     "rc": "1.2.8",
-    "shelljs": "0.8.4",
+    "shelljs": "0.8.5",
     "url-join": "4.0.1",
     "yoctocolors": "0.2.0"
   }

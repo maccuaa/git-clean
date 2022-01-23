@@ -41,7 +41,7 @@ const main = async () => {
 
   const b = new Branch(conf);
 
-  let answer = await inquirer.prompt([
+  const answer = await inquirer.prompt([
     {
       type: "list",
       name: "type",
@@ -108,6 +108,7 @@ const main = async () => {
     switch (answer.action) {
       case LIST_ALL:
         branches.forEach(b.prettyPrint);
+        branches = b.groupByNone(branches);
         break;
       case LIST_BY_AUTHOR:
         branches = b.groupByAuthor(branches);

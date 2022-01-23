@@ -64,6 +64,10 @@ export default class Helper {
     return branches;
   };
 
+  groupByNone = (branches) => ({
+    Branches: branches,
+  });
+
   groupByAuthor = (branches) => {
     const groups = {};
     branches.forEach((branch) => {
@@ -94,10 +98,10 @@ export default class Helper {
 
     authors.forEach((author) => {
       const branches = branchesByAuthor[author];
-      console.log(c.underline.green(author), "-", c.bold.red(branches.length));
+      console.log(c.underline(c.green(author), "-", c.bold(c.red(branches.length))));
       console.log();
       branches.forEach((branch) =>
-        console.log(c.blue(branch.prettyDate.padEnd(25)), branch.prettyName.padEnd(75), c.cyan(branch.url))
+        console.log(c.magenta(branch.prettyDate.padEnd(25)), branch.prettyName.padEnd(75), c.cyan(branch.url))
       );
       console.log();
     });
