@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "inquirer": "8.2.0",
-    "ora": "6.0.1",
+    "ora": "6.1.0",
     "rc": "1.2.8",
     "shelljs": "0.8.5",
     "url-join": "4.0.1",
