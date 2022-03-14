@@ -29,7 +29,7 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
-    "inquirer": "8.2.0",
+    "inquirer": "8.2.1",
     "ora": "6.1.0",
     "rc": "1.2.8",
     "shelljs": "0.8.5",
