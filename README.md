@@ -39,6 +39,14 @@ REMOTE_URL =
 JIRA_PROJECTS =
 MAIN_BRANCH = master
 PROTECTED_BRANCHES = HEAD, origin/master
+
+# SMTP Settings
+# see nodeemailer for more support servers
+# https://github.com/nodemailer/nodemailer/blob/master/lib/well-known/services.json
+
+SMTP_SERVER = Hotmail
+SMTP_USER = <username>
+SMTP_PASSWORD = <password>
 ```
 
 #### Options
