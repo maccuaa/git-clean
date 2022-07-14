@@ -193,7 +193,7 @@ export default class Helper {
         .map((branch, idx) => [idx, branch.prettyDate, branch.prettyName, branch.url].join(","))
         .join("\n");
       await this.transport.sendMail({
-        from: `CLEAN_YOUR_BRANCHES <${this.conf.SMTP_USER}>`,
+        from: `Git Clean <${this.conf.SMTP_USER}>`,
         to: email,
         subject: "Please clean up your branches",
         text: `Hi ${author},\n\nPlease clean up your branches:\n\n${branchesStr}\n\nThanks`,
