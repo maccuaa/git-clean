@@ -16,6 +16,7 @@ const LIST_BY_AUTHOR = "list_by_author";
 const FIND_BY_AUTHOR = "find_by_author";
 const VIEW_ONLY = "view_only";
 const VIEW_AND_DELETE = "view_and_delete";
+const EMAIL_LAST_COMMITTER = "email_last_committer";
 
 /* ============================================================================================
  * Main Function
@@ -98,6 +99,10 @@ const main = async () => {
           name: "View and delete",
           value: VIEW_AND_DELETE,
         },
+        {
+          name: "Email last committer",
+          value: EMAIL_LAST_COMMITTER,
+        },
       ],
     },
   ]);
@@ -124,8 +129,18 @@ const main = async () => {
     b.prettyPrintByAuthor(branches);
   }
 
-  if (answer.outcome === VIEW_AND_DELETE) {
-    await b.deleteBranches(branches, answer.type);
+  switch (answer.outcome) {
+    case VIEW_ONLY:
+      break;
+    case VIEW_AND_DELETE:
+      await b.deleteBranches(branches, answer.type);
+      break;
+    case EMAIL_LAST_COMMITTER:
+      if (answer.type === REMOTE && answer.action === LIST_ALL) {
+        branches = b.groupByAuthor(branches.Branches);
+      }
+      await b.emailLastCommitter(branches);
+      break;
   }
 
   shell.exit(0);

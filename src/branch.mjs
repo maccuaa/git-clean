@@ -6,15 +6,34 @@ import inquirer from "inquirer";
 import ora from "ora";
 import shell from "shelljs";
 import urlJoin from "url-join";
+import nodemailer from "nodemailer";
 
 export default class Helper {
   conf = null;
   jiraProjects = [];
+  transport = null;
 
   constructor(conf) {
     this.conf = conf;
 
     this.jiraProjects = this.getJiraProjects(conf);
+    if (conf.SMTP_SERVER) {
+      this.transport = nodemailer.createTransport({
+        service: conf.SMTP_SERVER,
+        auth: {
+          user: conf.SMTP_USER,
+          pass: conf.SMTP_PASSWORD,
+        },
+      });
+
+      this.transport.verify((error) => {
+        if (error) {
+          console.error(c.red(error));
+        } else {
+          console.log(c.green("✔"), "Server is ready to take our messages");
+        }
+      });
+    }
   }
 
   getBranches = async (type, mergeState) => {
@@ -159,6 +178,29 @@ export default class Helper {
     }
   };
 
+  emailLastCommitter = async (branchesByAuthor) => {
+    if (!this.transport) {
+      console.log(c.red("No SMTP server configured. Skipping email."));
+      return;
+    }
+    const authors = Object.keys(branchesByAuthor).sort();
+
+    authors.forEach(async (author) => {
+      const branches = branchesByAuthor[author];
+      const { email } = branches[0];
+      console.log(`${c.green("✔")} Sending email to ${author} <${email}>...`);
+      const branchesStr = branches
+        .map((branch, idx) => [idx, branch.prettyDate, branch.prettyName, branch.url].join(","))
+        .join("\n");
+      await this.transport.sendMail({
+        from: `Git Clean <${this.conf.SMTP_USER}>`,
+        to: email,
+        subject: "Please clean up your branches",
+        text: `Hi ${author},\n\nPlease clean up your branches:\n\n${branchesStr}\n\nThanks`,
+      });
+    });
+  };
+
   // ============================================================================================
   // PRIVATE FUNCTIONS
   // ============================================================================================
@@ -226,7 +268,7 @@ export default class Helper {
    *    %cI: committer date (ISO 8601)
    */
   getBranchInfo = async (branch) => {
-    let info = await execAsync(`git log -n 1 --pretty=format:"%cn | %cr | %cI" "${branch}"`, {
+    let info = await execAsync(`git log -n 1 --pretty=format:"%cn | %cr | %cI | %ce" "${branch}"`, {
       silent: true,
     });
 
@@ -236,6 +278,7 @@ export default class Helper {
       author: info[0],
       prettyDate: info[1],
       date: new Date(info[2]),
+      email: info[3],
       name: branch,
       prettyName: branch.replace("origin/", ""),
       url: this.getJiraUrl(branch),
