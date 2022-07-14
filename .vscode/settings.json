@@ -13,7 +13,6 @@
   //
   "editor.formatOnSave": true,
   "editor.multiCursorModifier": "ctrlCmd",
-  "editor.renderIndentGuides": true,
   "editor.tabSize": 2,
   "editor.minimap.enabled": false,
   "editor.minimap.renderCharacters": false,
@@ -31,5 +30,6 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  }
+  },
+  "editor.guides.indentation": true
 }
