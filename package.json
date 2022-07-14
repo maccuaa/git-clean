@@ -31,7 +31,7 @@
   "dependencies": {
     "inquirer": "9.0.0",
     "nodemailer": "^6.7.7",
-    "ora": "6.1.0",
+    "ora": "6.1.2",
     "rc": "1.2.8",
     "shelljs": "0.8.5",
     "url-join": "5.0.0",
