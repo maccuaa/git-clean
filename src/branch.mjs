@@ -178,27 +178,44 @@ export default class Helper {
     }
   };
 
-  emailLastCommitter = async (branchesByAuthor) => {
+  emailLastCommitter = async (branchesByAuthor, mergeState) => {
     if (!this.transport) {
       console.log(c.red("No SMTP server configured. Skipping email."));
       return;
     }
     const authors = Object.keys(branchesByAuthor).sort();
 
-    authors.forEach(async (author) => {
+    for (let i = 0; i < authors.length; i++) {
+      const author = authors[i];
       const branches = branchesByAuthor[author];
       const { email } = branches[0];
-      console.log(`${c.green("✔")} Sending email to ${author} <${email}>...`);
-      const branchesStr = branches
-        .map((branch, idx) => [idx, branch.prettyDate, branch.prettyName, branch.url].join(","))
-        .join("\n");
-      await this.transport.sendMail({
-        from: `Git Clean <${this.conf.SMTP_USER}>`,
-        to: email,
-        subject: "Please clean up your branches",
-        text: `Hi ${author},\n\nPlease clean up your branches:\n\n${branchesStr}\n\nThanks`,
-      });
-    });
+
+      this.prettyPrintByAuthor({ [author]: branchesByAuthor[author] });
+
+      const answers = await inquirer.prompt([
+        {
+          type: "confirm",
+          name: "email",
+          message: `Would you like to email ${c.underline(c.green(author))} <${email}> about these ${c.italic(
+            mergeState === "merged" ? c.green("merged") : c.red("unmerged")
+          )} branches?`,
+          default: false,
+        },
+      ]);
+
+      console.log();
+
+      if (answers.email) {
+        const html = this.getEmailHtml(author, mergeState, branches);
+        console.log(`${c.green("✔")} Sending email to ${author} ${c.underline(email)}...`);
+        await this.transport.sendMail({
+          from: `Git Clean ${this.conf.SMTP_USER}`,
+          to: email,
+          subject: "Please clean up your branches",
+          html: html,
+        });
+      }
+    }
   };
 
   // ============================================================================================
@@ -301,6 +318,53 @@ export default class Helper {
 
     return conf.JIRA_PROJECTS.split(",").map((b) => b.trim());
   };
+
+  getEmailHtml = (author, mergeState, branches) => `
+    <p> Hi ${author},</p>
+    <p>
+      This is a reminder that you are the last committer of the following branches. If the branches were
+      created by you, please review them to see if they are still needed.
+    </p>
+    <p>
+      Also, it is likely that you are not the owner of the branch, in which case, please contact the owners of these branches.
+    </p>
+    ${
+      mergeState === "merged"
+        ? `<p>The following branches have been merged into <code>${this.conf.MAIN_BRANCH}</code> branch, please clean them up:</p>`
+        : `<p>The following branches have not been merged into <code>${this.conf.MAIN_BRANCH}</code> branch, please confirm they are still under development:</p>`
+    }
+    <table style="border: 1px solid black; border-collapse: collapse; padding: 5px;">
+      <thead>
+        <tr>
+          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">#</th>
+          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Name</th>
+          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Last Update</th>
+          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Jira</th>
+          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Merge State</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${branches
+          .map(
+            (branch, idx) =>
+              `<tr>
+          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${idx + 1}</td>
+          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${branch.prettyName}</td>
+          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${branch.prettyDate}</td>
+          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">
+            <a href="${branch.url}">${branch.url.split("/").pop()}</a>
+          </td>
+          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${
+            mergeState === "merged" ? "Merged" : "Unmerged"
+          }</td>
+        </tr>`
+          )
+          .join("\n")}
+      </tbody>
+    </table>
+    <p>Thanks for your help! We appreciate it.</p>
+    <p>Regards,</p>
+    <p>Git Clean</p>`;
 
   prune = () => {
     exec("git remote prune origin");

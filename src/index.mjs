@@ -76,16 +76,21 @@ const main = async () => {
           name: "Find by author",
           value: FIND_BY_AUTHOR,
         },
+        {
+          name: "Email last committer",
+          value: EMAIL_LAST_COMMITTER,
+        },
       ],
     },
     {
-      when: (answers) => answers.action === FIND_BY_AUTHOR,
+      when: (answers) => answers.action === FIND_BY_AUTHOR && answers.type !== EMAIL_LAST_COMMITTER,
       type: "input",
       name: "author",
       message: "Enter author name (case-insensitive)",
       validate: (value) => !!value,
     },
     {
+      when: (answers) => answers.action !== EMAIL_LAST_COMMITTER,
       type: "list",
       name: "outcome",
       message: "Do you want to view or view and delete branches?",
@@ -98,10 +103,6 @@ const main = async () => {
         {
           name: "View and delete",
           value: VIEW_AND_DELETE,
-        },
-        {
-          name: "Email last committer",
-          value: EMAIL_LAST_COMMITTER,
         },
       ],
     },
@@ -123,6 +124,10 @@ const main = async () => {
         branches = b.branchesByAuthor(branches, answer.author);
         b.prettyPrintByAuthor(branches);
         break;
+      case EMAIL_LAST_COMMITTER:
+        branches = b.groupByAuthor(branches);
+        b.emailLastCommitter(branches, answer.mergeState);
+        break;
     }
   } else {
     branches = b.groupByAuthor(branches);
@@ -134,12 +139,6 @@ const main = async () => {
       break;
     case VIEW_AND_DELETE:
       await b.deleteBranches(branches, answer.type);
-      break;
-    case EMAIL_LAST_COMMITTER:
-      if (answer.type === REMOTE && answer.action === LIST_ALL) {
-        branches = b.groupByAuthor(branches.Branches);
-      }
-      await b.emailLastCommitter(branches);
       break;
   }
 
