@@ -326,12 +326,12 @@ export default class Helper {
       created by you, please review them to see if they are still needed.
     </p>
     <p>
-      Also, it is likely that you are not the owner of the branch, in which case, please contact the owners of these branches.
+      If you are not the owner of the branch please contact the owner to see if it is still needed.
     </p>
     ${
       mergeState === "merged"
-        ? `<p>The following branches have been merged into <code>${this.conf.MAIN_BRANCH}</code> branch, please clean them up:</p>`
-        : `<p>The following branches have not been merged into <code>${this.conf.MAIN_BRANCH}</code> branch, please confirm they are still under development:</p>`
+        ? `<p>The following branches have been merged into the <code>${this.conf.MAIN_BRANCH}</code> branch, please clean them up:</p>`
+        : `<p>The following branches have not been merged into the <code>${this.conf.MAIN_BRANCH}</code> branch, please confirm if they are still under development:</p>`
     }
     <table style="border: 1px solid black; border-collapse: collapse; padding: 5px;">
       <thead>
