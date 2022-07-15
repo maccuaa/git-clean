@@ -141,8 +141,6 @@ const main = async () => {
       await b.deleteBranches(branches, answer.type);
       break;
   }
-
-  shell.exit(0);
 };
 
 // Run main
