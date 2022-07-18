@@ -32,12 +32,25 @@ This example also shows the default values git-clean uses.
 ```ini
 # .gitcleanrc
 
+#
 # Required
+#
+
+# the URL to the remote Git server
 REMOTE_URL =
 
+#
 # Optional
+#
+
+# comma separated list of Jira project codes that you want to display links for
 JIRA_PROJECTS =
+
+# the name of your main branch. Generally this is the _master_ branch
 MAIN_BRANCH = master
+
+# comma separated list of branches that are protected and should not be deleted.
+# branches matching any of PROTECTED_BRANCHES values these values will not be displayed by git-clean.
 PROTECTED_BRANCHES = HEAD, origin/master
 
 # If you have email address updates for your git users, you can use this to map them to the correct email address.
@@ -54,17 +67,6 @@ SMTP_PASSWORD = <password>
 # See https://docs.microsoft.com/en-us/microsoftteams/office-365-custom-connectors
 TEAMS_WEBHOOK_URL = https://XXXXX.webhook.office.com/webhookb2/XXXXX
 ```
-
-#### Options
-
-| Option             | Description                                                                    |
-| ------------------ | ------------------------------------------------------------------------------ |
-| REMOTE_URL         | the URL to the remote Git server                                               |
-| JIRA_PROJECTS      | comma separated list of Jira project codes that you want to display links for  |
-| MAIN_BRANCH        | the name of your main branch. Generally this is the _master_ branch            |
-| PROTECTED_BRANCHES | comma separated list of branches that are protected and should not be deleted. |
-
-Branches matching any of PROTECTED_BRANCHES values these values will not be displayed by git-clean.
 
 # Recommended Setup for large projects
 
