@@ -7,6 +7,9 @@ import ora from "ora";
 import shell from "shelljs";
 import urlJoin from "url-join";
 import nodemailer from "nodemailer";
+import fetch from "node-fetch";
+
+import { getEmailHtml, getTeamsAdaptiveCard } from "./utils.mjs";
 
 export default class Helper {
   conf = null;
@@ -17,6 +20,7 @@ export default class Helper {
     this.conf = conf;
 
     this.jiraProjects = this.getJiraProjects(conf);
+
     if (conf.SMTP_SERVER) {
       this.transport = nodemailer.createTransport({
         service: conf.SMTP_SERVER,
@@ -32,6 +36,14 @@ export default class Helper {
         } else {
           console.log(c.green("✔"), "Server is ready to take our messages");
         }
+      });
+    }
+
+    if (this.conf.EMAIL_ALIAS) {
+      this.emailAlias = {};
+      this.conf.EMAIL_ALIAS.split("|").forEach((pair) => {
+        const [key, value] = pair.split(":");
+        this.emailAlias[key] = value;
       });
     }
   }
@@ -183,20 +195,69 @@ export default class Helper {
       console.log(c.red("No SMTP server configured. Skipping email."));
       return;
     }
+
+    const fn = async (author, email, mergeState, branches, mainBranch) => {
+      const html = getEmailHtml(author, email, mergeState, branches, mainBranch);
+
+      await this.transport.sendMail({
+        from: `Git Clean ${this.conf.SMTP_USER}`,
+        to: email,
+        subject: "Please clean up your branches",
+        html: html,
+      });
+
+      console.log();
+
+      console.log(`${c.green("✔")} Sent email to ${author} ${c.underline(email)}`);
+
+      console.log();
+    };
+
+    this.notifyHelper(branchesByAuthor, mergeState, fn);
+  };
+
+  notifyThroughTeams = (branchesByAuthor, mergeState) => {
+    if (!this.conf.TEAMS_WEBHOOK_URL) {
+      console.log(c.red("No Teams webhook configured. Skipping notification."));
+      return;
+    }
+
+    const fn = async (author, email, mergeState, branches, mainBranch) => {
+      const msg = getTeamsAdaptiveCard(author, email, mergeState, branches, mainBranch);
+
+      await fetch(this.conf.TEAMS_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(msg),
+      });
+
+      console.log();
+
+      console.log(c.green("✔"), `Notified ${author} ${c.underline(email)} through Teams Channel`);
+
+      console.log();
+    };
+
+    this.notifyHelper(branchesByAuthor, mergeState, fn);
+  };
+
+  notifyHelper = async (branchesByAuthor, mergeState, fn) => {
     const authors = Object.keys(branchesByAuthor).sort();
 
     for (let i = 0; i < authors.length; i++) {
       const author = authors[i];
       const branches = branchesByAuthor[author];
-      const { email } = branches[0];
+      const email = this.processEmailAliases(branches[0].email);
 
       this.prettyPrintByAuthor({ [author]: branchesByAuthor[author] });
 
       const answers = await inquirer.prompt([
         {
           type: "confirm",
-          name: "email",
-          message: `Would you like to email ${c.underline(c.green(author))} <${email}> about these ${c.italic(
+          name: "notify",
+          message: `Would you like to notify ${c.underline(c.green(author))} <${email}> about these ${c.italic(
             mergeState === "merged" ? c.green("merged") : c.red("unmerged")
           )} branches?`,
           default: false,
@@ -205,15 +266,8 @@ export default class Helper {
 
       console.log();
 
-      if (answers.email) {
-        const html = this.getEmailHtml(author, mergeState, branches);
-        console.log(`${c.green("✔")} Sending email to ${author} ${c.underline(email)}...`);
-        await this.transport.sendMail({
-          from: `Git Clean ${this.conf.SMTP_USER}`,
-          to: email,
-          subject: "Please clean up your branches",
-          html: html,
-        });
+      if (answers.notify) {
+        await fn(author, email, mergeState, branches, this.conf.MAIN_BRANCH);
       }
     }
   };
@@ -319,52 +373,14 @@ export default class Helper {
     return conf.JIRA_PROJECTS.split(",").map((b) => b.trim());
   };
 
-  getEmailHtml = (author, mergeState, branches) => `
-    <p> Hi ${author},</p>
-    <p>
-      This is a reminder that you are the last committer of the following branches. If the branches were
-      created by you, please review them to see if they are still needed.
-    </p>
-    <p>
-      If you are not the owner of the branch please contact the owner to see if it is still needed.
-    </p>
-    ${
-      mergeState === "merged"
-        ? `<p>The following branches have been merged into the <code>${this.conf.MAIN_BRANCH}</code> branch, please clean them up:</p>`
-        : `<p>The following branches have not been merged into the <code>${this.conf.MAIN_BRANCH}</code> branch, please confirm if they are still under development:</p>`
+  processEmailAliases = (email) => {
+    for (const old in this.emailAlias) {
+      if (email.includes(old)) {
+        return email.replace(old, this.emailAlias[old]);
+      }
     }
-    <table style="border: 1px solid black; border-collapse: collapse; padding: 5px;">
-      <thead>
-        <tr>
-          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">#</th>
-          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Name</th>
-          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Last Update</th>
-          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Jira</th>
-          <th style="border: 1px solid black; border-collapse: collapse; padding: 5px">Merge State</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${branches
-          .map(
-            (branch, idx) =>
-              `<tr>
-          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${idx + 1}</td>
-          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${branch.prettyName}</td>
-          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${branch.prettyDate}</td>
-          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">
-            <a href="${branch.url}">${branch.url.split("/").pop()}</a>
-          </td>
-          <td style="border: 1px solid black; border-collapse: collapse; padding: 5px">${
-            mergeState === "merged" ? "Merged" : "Unmerged"
-          }</td>
-        </tr>`
-          )
-          .join("\n")}
-      </tbody>
-    </table>
-    <p>Thanks for your help! We appreciate it.</p>
-    <p>Regards,</p>
-    <p>Git Clean</p>`;
+    return email;
+  };
 
   prune = () => {
     exec("git remote prune origin");

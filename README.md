@@ -40,13 +40,19 @@ JIRA_PROJECTS =
 MAIN_BRANCH = master
 PROTECTED_BRANCHES = HEAD, origin/master
 
+# If you have email address updates for your git users, you can use this to map them to the correct email address.
+EMAIL_ALIAS = old.com:new.com|old1.com:new1.com|old2.com:new2.com
+
 # SMTP Settings
 # see nodeemailer for more support servers
 # https://github.com/nodemailer/nodemailer/blob/master/lib/well-known/services.json
-
 SMTP_SERVER = Hotmail
 SMTP_USER = <username>
 SMTP_PASSWORD = <password>
+
+# Teams Channel Webhook Connector Endpoint
+# See https://docs.microsoft.com/en-us/microsoftteams/office-365-custom-connectors
+TEAMS_WEBHOOK_URL = https://XXXXX.webhook.office.com/webhookb2/XXXXX
 ```
 
 #### Options

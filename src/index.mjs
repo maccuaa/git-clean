@@ -17,6 +17,7 @@ const FIND_BY_AUTHOR = "find_by_author";
 const VIEW_ONLY = "view_only";
 const VIEW_AND_DELETE = "view_and_delete";
 const EMAIL_LAST_COMMITTER = "email_last_committer";
+const NOTIFY_THROUGH_TEAMS = "notify_through_teams";
 
 /* ============================================================================================
  * Main Function
@@ -80,17 +81,21 @@ const main = async () => {
           name: "Email last committer",
           value: EMAIL_LAST_COMMITTER,
         },
+        {
+          name: "Notify through teams",
+          value: NOTIFY_THROUGH_TEAMS,
+        },
       ],
     },
     {
-      when: (answers) => answers.action === FIND_BY_AUTHOR && answers.type !== EMAIL_LAST_COMMITTER,
+      when: (answers) => answers.action === FIND_BY_AUTHOR,
       type: "input",
       name: "author",
       message: "Enter author name (case-insensitive)",
       validate: (value) => !!value,
     },
     {
-      when: (answers) => answers.action !== EMAIL_LAST_COMMITTER,
+      when: (answers) => answers.action !== EMAIL_LAST_COMMITTER && answers.action !== NOTIFY_THROUGH_TEAMS,
       type: "list",
       name: "outcome",
       message: "Do you want to view or view and delete branches?",
@@ -127,6 +132,10 @@ const main = async () => {
       case EMAIL_LAST_COMMITTER:
         branches = b.groupByAuthor(branches);
         b.emailLastCommitter(branches, answer.mergeState);
+        break;
+      case NOTIFY_THROUGH_TEAMS:
+        branches = b.groupByAuthor(branches);
+        b.notifyThroughTeams(branches, answer.mergeState);
         break;
     }
   } else {
