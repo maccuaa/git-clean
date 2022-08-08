@@ -29,7 +29,7 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
-    "inquirer": "9.0.2",
+    "inquirer": "9.1.0",
     "node-fetch": "3.2.10",
     "nodemailer": "6.7.7",
     "ora": "6.1.2",
