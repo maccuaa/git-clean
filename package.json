@@ -31,7 +31,7 @@
   "dependencies": {
     "inquirer": "9.1.2",
     "node-fetch": "3.2.10",
-    "nodemailer": "6.7.8",
+    "nodemailer": "6.8.0",
     "ora": "6.1.2",
     "rc": "1.2.8",
     "shelljs": "0.8.5",
