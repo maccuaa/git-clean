@@ -32,7 +32,7 @@
     "inquirer": "9.2.9",
     "node-fetch": "3.3.2",
     "nodemailer": "6.9.4",
-    "ora": "7.0.0",
+    "ora": "7.0.1",
     "rc": "1.2.8",
     "shelljs": "0.8.5",
     "url-join": "5.0.0",
